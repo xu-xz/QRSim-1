@@ -7,6 +7,13 @@ import math
 import numpy as np
 
 
+def as_float(value):
+    # 列向量下标得到的是 shape 为 (1,) 或 (1, 1) 的数组。NumPy 2 不会再把它们收成 Python 数字。
+    if isinstance(value, np.ndarray):
+        return value.item()
+    return value
+
+
 def limit_thrust(thrust):  # 物理推进器组件推力限制
     if thrust >= 10000:
         # thrust = 10000
@@ -112,7 +119,7 @@ class Control1:
         p_0 = np.array([[target_location_x], [target_location_y]])  # Target的位置向量， [x_0, y_0]^T
         psi_5 = (p_5 - p_0) / rho_5  # Target与agent之间的连线的单位向量
         phi_5 = usv5_course_angle  # 方便移植，不然老是忘记这个是朝向
-        theta_5 = math.atan2(psi_5[1], psi_5[0])  # Target与agent之间连线的方位角
+        theta_5 = math.atan2(as_float(psi_5[1]), as_float(psi_5[0]))  # Target与agent之间连线的方位角
         bar_psi_5 = np.array(
             [[math.cos(theta_5 + math.pi / 2)],
              [math.sin(theta_5 + math.pi / 2)]])  # 与psi角垂直的向量，-pi/2表示逆时针旋转,与MATLAB坐标系不同
@@ -184,13 +191,13 @@ class Control1:
         p_0 = np.array([[target_location_x], [target_location_y]])  # Target的位置向量， [x_0, y_0]^T
         psi_4 = (p_4 - p_0) / rho_4  # Target与agent之间的连线的单位向量
         phi_4 = usv4_course_angle  # 方便移植，不然老是忘记这个是朝向
-        theta_4 = math.atan2(psi_4[1], psi_4[0])  # Target与agent之间连线的方位角
+        theta_4 = math.atan2(as_float(psi_4[1]), as_float(psi_4[0]))  # Target与agent之间连线的方位角
         bar_psi_4 = np.array(
             [[math.cos(theta_4 + math.pi / 2)],
              [math.sin(theta_4 + math.pi / 2)]])  # 与psi角垂直的向量，-pi/2表示逆时针旋转,与MATLAB坐标系不同
         p_04 = p_4 - p_0
         p_05 = p_5 - p_0
-        angle_alpha_45 = math.acos(np.dot(p_04.T, p_05) / (np.linalg.norm(p_04) * np.linalg.norm(p_05)))
+        angle_alpha_45 = math.acos(as_float(np.dot(p_04.T, p_05) / (np.linalg.norm(p_04) * np.linalg.norm(p_05))))
         e_alpha_45 = angle_alpha_45 - self.alpha_des45
         beta_alpha45 = Control1.beta(self, current_time)
         d_beta_alpha45 = Control1.d_beta(self, current_time)
@@ -256,13 +263,13 @@ class Control1:
         p_0 = np.array([[target_location_x], [target_location_y]])  # Target的位置向量， [x_0, y_0]^T
         psi_3 = (p_3 - p_0) / rho_3  # Target与agent之间的连线的单位向量
         phi_3 = usv3_course_angle  # 方便移植，不然老是忘记这个是朝向
-        theta_3 = math.atan2(psi_3[1], psi_3[0])  # Target与agent之间连线的方位角
+        theta_3 = math.atan2(as_float(psi_3[1]), as_float(psi_3[0]))  # Target与agent之间连线的方位角
         bar_psi_3 = np.array(
             [[math.cos(theta_3 + math.pi / 2)],
              [math.sin(theta_3 + math.pi / 2)]])  # 与psi角垂直的向量，-pi/2表示逆时针旋转,与MATLAB坐标系不同
         p_03 = p_3 - p_0
         p_04 = p_4 - p_0
-        angle_alpha_34 = math.acos(np.dot(p_03.T, p_04) / (np.linalg.norm(p_03) * np.linalg.norm(p_04)))
+        angle_alpha_34 = math.acos(as_float(np.dot(p_03.T, p_04) / (np.linalg.norm(p_03) * np.linalg.norm(p_04))))
         e_alpha_34 = angle_alpha_34 - self.alpha_des34
         beta_alpha34 = Control1.beta(self, current_time)
         d_beta_alpha34 = Control1.d_beta(self, current_time)
@@ -328,13 +335,13 @@ class Control1:
         p_0 = np.array([[target_location_x], [target_location_y]])  # Target的位置向量， [x_0, y_0]^T
         psi_2 = (p_2 - p_0) / rho_2  # Target与agent之间的连线的单位向量
         phi_2 = usv2_course_angle  # 方便移植，不然老是忘记这个是朝向
-        theta_2 = math.atan2(psi_2[1], psi_2[0])  # Target与agent之间连线的方位角
+        theta_2 = math.atan2(as_float(psi_2[1]), as_float(psi_2[0]))  # Target与agent之间连线的方位角
         bar_psi_2 = np.array(
             [[math.cos(theta_2 + math.pi / 2)],
              [math.sin(theta_2 + math.pi / 2)]])  # 与psi角垂直的向量，-pi/2表示逆时针旋转,与MATLAB坐标系不同
-        p_02 = p_2 - p_0
-        p_03 = p_3 - p_0
-        angle_alpha_23 = math.acos(np.dot(p_02.T, p_03) / (np.linalg.norm(p_02) * np.linalg.norm(p_03)))
+        p_02 = p_2 - p_0 # Target与agent2之间的连线向量
+        p_03 = p_3 - p_0 # Target与agent3之间的连线向量
+        angle_alpha_23 = math.acos(as_float(np.dot(p_02.T, p_03) / (np.linalg.norm(p_02) * np.linalg.norm(p_03))))
         e_alpha_23 = angle_alpha_23 - self.alpha_des23
         beta_alpha23 = Control1.beta(self, current_time)
         d_beta_alpha23 = Control1.d_beta(self, current_time)
@@ -400,13 +407,13 @@ class Control1:
         p_0 = np.array([[target_location_x], [target_location_y]])  # Target的位置向量， [x_0, y_0]^T
         psi_1 = (p_1 - p_0) / rho_1  # Target与agent之间的连线的单位向量
         phi_1 = usv1_course_angle  # 方便移植，不然老是忘记这个是朝向
-        theta_1 = math.atan2(psi_1[1], psi_1[0])  # Target与agent之间连线的方位角
+        theta_1 = math.atan2(as_float(psi_1[1]), as_float(psi_1[0]))  # Target与agent之间连线的方位角
         bar_psi_1 = np.array(
             [[math.cos(theta_1 + math.pi / 2)],
              [math.sin(theta_1 + math.pi / 2)]])  # 与psi角垂直的向量，-pi/2表示逆时针旋转,与MATLAB坐标系不同
         p_01 = p_1 - p_0
         p_02 = p_2 - p_0
-        angle_alpha_12 = math.acos(np.dot(p_01.T, p_02) / (np.linalg.norm(p_01) * np.linalg.norm(p_02)))
+        angle_alpha_12 = math.acos(as_float(np.dot(p_01.T, p_02) / (np.linalg.norm(p_01) * np.linalg.norm(p_02))))
         e_alpha_12 = angle_alpha_12 - self.alpha_des12
         beta_alpha12 = Control1.beta(self, current_time)
         d_beta_alpha12 = Control1.d_beta(self, current_time)
@@ -445,7 +452,7 @@ class Control1:
 
         # 第n艘与第1艘之间的夹角
         p_05 = p_5 - p_0
-        angle_alpha_51 = math.acos(np.dot(p_05.T, p_01) / (np.linalg.norm(p_05) * np.linalg.norm(p_01)))
+        angle_alpha_51 = math.acos(as_float(np.dot(p_05.T, p_01) / (np.linalg.norm(p_05) * np.linalg.norm(p_01))))
         e_alpha_51 = angle_alpha_51 - (math.pi * 2 - self.alpha_des12 - self.alpha_des23 - self.alpha_des34 -
                                        self.alpha_des45)
 
